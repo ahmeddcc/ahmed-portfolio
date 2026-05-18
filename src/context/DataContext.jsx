@@ -89,6 +89,30 @@ export function DataProvider({ children }) {
     }));
   }, [setData]);
 
+  // إضافة تعليم
+  const addEducation = useCallback((edu) => {
+    setData(prev => ({
+      ...prev,
+      education: [...(prev.education || []), { ...edu, id: Date.now() }]
+    }));
+  }, [setData]);
+
+  // حذف تعليم
+  const deleteEducation = useCallback((eduId) => {
+    setData(prev => ({
+      ...prev,
+      education: (prev.education || []).filter(e => e.id !== eduId)
+    }));
+  }, [setData]);
+
+  // تحديث تعليم
+  const updateEducation = useCallback((eduId, updates) => {
+    setData(prev => ({
+      ...prev,
+      education: (prev.education || []).map(e => e.id === eduId ? { ...e, ...updates } : e)
+    }));
+  }, [setData]);
+
   // تحديث الإعدادات
   const updateSettings = useCallback((newSettings) => {
     setData(prev => ({
@@ -143,6 +167,9 @@ export function DataProvider({ children }) {
     addExperience,
     deleteExperience,
     updateExperience,
+    addEducation,
+    deleteEducation,
+    updateEducation,
     updateSettings,
     updatePersonal,
     updateCertifications,

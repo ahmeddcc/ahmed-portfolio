@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Layout/Navbar.jsx';
 import Footer from './components/Layout/Footer.jsx';
 import ScrollToTop from './components/UI/ScrollToTop.jsx';
 import AdminLogin from './components/Admin/AdminLogin.jsx';
+import { useData } from './context/DataContext.jsx';
 
 const Home = lazy(() => import('./pages/Home.jsx'));
 const About = lazy(() => import('./pages/About.jsx'));
@@ -62,12 +63,16 @@ function PublicRoutes() {
 
 function AdminRoutes() {
   const location = useLocation();
+  const { isAdmin } = useData();
   
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes location={location}>
         <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route 
+          path="/admin/dashboard" 
+          element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin" replace />} 
+        />
       </Routes>
     </Suspense>
   );

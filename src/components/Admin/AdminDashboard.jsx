@@ -14,6 +14,7 @@ import EducationManager from './EducationManager.jsx';
 import SkillsManager from './SkillsManager.jsx';
 import CertificationsManager from './CertificationsManager.jsx';
 import SettingsPanel from './SettingsPanel.jsx';
+import Toast from './Toast.jsx';
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, color: 'from-blue-500 to-indigo-600', bgColor: 'bg-blue-50', textColor: 'text-blue-600' },
@@ -27,7 +28,7 @@ const tabs = [
 ];
 
 export default function AdminDashboard() {
-  const { isAdmin, logoutAdmin, data } = useData();
+  const { isAdmin, logoutAdmin, data, toasts, removeToast } = useData();
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -67,6 +68,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+      {/* Toast Notifications */}
+      <Toast toasts={toasts} removeToast={removeToast} />
+
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {sidebarOpen && (

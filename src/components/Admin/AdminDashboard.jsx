@@ -4,13 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, FileText, Briefcase, History, Settings, LogOut,
   ChevronRight, Menu, X, Award, Shield, User, Bell, Moon, Sun,
-  GraduationCap
+  GraduationCap, Zap
 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 import PagesManager from './PagesManager.jsx';
 import ProjectsManager from './ProjectsManager.jsx';
 import ExperienceManager from './ExperienceManager.jsx';
 import EducationManager from './EducationManager.jsx';
+import SkillsManager from './SkillsManager.jsx';
 import CertificationsManager from './CertificationsManager.jsx';
 import SettingsPanel from './SettingsPanel.jsx';
 
@@ -20,6 +21,7 @@ const tabs = [
   { id: 'projects', label: 'Projects', icon: Briefcase, color: 'from-amber-500 to-orange-600', bgColor: 'bg-amber-50', textColor: 'text-amber-600' },
   { id: 'experience', label: 'Experience', icon: History, color: 'from-emerald-500 to-teal-600', bgColor: 'bg-emerald-50', textColor: 'text-emerald-600' },
   { id: 'education', label: 'Education', icon: GraduationCap, color: 'from-cyan-500 to-blue-600', bgColor: 'bg-cyan-50', textColor: 'text-cyan-600' },
+  { id: 'skills', label: 'Skills', icon: Zap, color: 'from-purple-500 to-violet-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600' },
   { id: 'certifications', label: 'Certifications', icon: Award, color: 'from-rose-500 to-pink-600', bgColor: 'bg-rose-50', textColor: 'text-rose-600' },
   { id: 'settings', label: 'Settings', icon: Settings, color: 'from-slate-500 to-slate-700', bgColor: 'bg-slate-50', textColor: 'text-slate-600' }
 ];
@@ -35,11 +37,16 @@ export default function AdminDashboard() {
     return <Navigate to="/admin" replace />;
   }
 
+  const totalSkills = (data.skills?.development?.length || 0) + 
+                      (data.skills?.technical?.length || 0) + 
+                      (data.skills?.soft?.length || 0);
+
   const stats = [
     { label: 'Total Pages', value: data.pages.length, icon: FileText, color: 'bg-blue-500', lightColor: 'bg-blue-50 text-blue-600' },
     { label: 'Projects', value: data.projects.length, icon: Briefcase, color: 'bg-amber-500', lightColor: 'bg-amber-50 text-amber-600' },
     { label: 'Experience', value: data.experience.length, icon: History, color: 'bg-emerald-500', lightColor: 'bg-emerald-50 text-emerald-600' },
     { label: 'Education', value: data.education?.length || 0, icon: GraduationCap, color: 'bg-cyan-500', lightColor: 'bg-cyan-50 text-cyan-600' },
+    { label: 'Skills', value: totalSkills, icon: Zap, color: 'bg-purple-500', lightColor: 'bg-purple-50 text-purple-600' },
     { label: 'Certifications', value: data.certifications?.length || 0, icon: Award, color: 'bg-rose-500', lightColor: 'bg-rose-50 text-rose-600' }
   ];
 
@@ -49,6 +56,7 @@ export default function AdminDashboard() {
       case 'projects': return <ProjectsManager />;
       case 'experience': return <ExperienceManager />;
       case 'education': return <EducationManager />;
+      case 'skills': return <SkillsManager />;
       case 'certifications': return <CertificationsManager />;
       case 'settings': return <SettingsPanel />;
       default: return <Overview stats={stats} />;
@@ -232,7 +240,7 @@ function Overview({ stats }) {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {stats.map((stat, index) => (
           <motion.div
             key={index}

@@ -8,6 +8,28 @@ export function DataProvider({ children }) {
   const [data, setData] = useLocalStorage('portfolioData', initialData);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useLocalStorage('adminPassword', initialData.settings.password);
+  const [toasts, setToasts] = useState([]);
+
+  // Toast System
+  const addToast = useCallback((type, title, message) => {
+    const id = Date.now() + Math.random();
+    const newToast = {
+      id,
+      type,
+      title,
+      message: message || title,
+    };
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  }, []);
+
+  const removeToast = useCallback((toastId) => {
+    setToasts(prev => prev.filter(t => t.id !== toastId));
+  }, []);
 
   // تحديث أي جزء من البيانات
   const updateData = useCallback((section, newData) => {
@@ -190,6 +212,9 @@ export function DataProvider({ children }) {
     data,
     isAdmin,
     adminPassword,
+    toasts,
+    addToast,
+    removeToast,
     updateData,
     addPage,
     deletePage,

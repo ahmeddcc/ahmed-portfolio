@@ -3,12 +3,14 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, FileText, Briefcase, History, Settings, LogOut,
-  ChevronRight, Menu, X, Award, Shield, User, Bell, Moon, Sun
+  ChevronRight, Menu, X, Award, Shield, User, Bell, Moon, Sun,
+  GraduationCap
 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 import PagesManager from './PagesManager.jsx';
 import ProjectsManager from './ProjectsManager.jsx';
 import ExperienceManager from './ExperienceManager.jsx';
+import EducationManager from './EducationManager.jsx';
 import CertificationsManager from './CertificationsManager.jsx';
 import SettingsPanel from './SettingsPanel.jsx';
 
@@ -17,6 +19,7 @@ const tabs = [
   { id: 'pages', label: 'Pages', icon: FileText, color: 'from-indigo-500 to-purple-600', bgColor: 'bg-indigo-50', textColor: 'text-indigo-600' },
   { id: 'projects', label: 'Projects', icon: Briefcase, color: 'from-amber-500 to-orange-600', bgColor: 'bg-amber-50', textColor: 'text-amber-600' },
   { id: 'experience', label: 'Experience', icon: History, color: 'from-emerald-500 to-teal-600', bgColor: 'bg-emerald-50', textColor: 'text-emerald-600' },
+  { id: 'education', label: 'Education', icon: GraduationCap, color: 'from-cyan-500 to-blue-600', bgColor: 'bg-cyan-50', textColor: 'text-cyan-600' },
   { id: 'certifications', label: 'Certifications', icon: Award, color: 'from-rose-500 to-pink-600', bgColor: 'bg-rose-50', textColor: 'text-rose-600' },
   { id: 'settings', label: 'Settings', icon: Settings, color: 'from-slate-500 to-slate-700', bgColor: 'bg-slate-50', textColor: 'text-slate-600' }
 ];
@@ -36,6 +39,7 @@ export default function AdminDashboard() {
     { label: 'Total Pages', value: data.pages.length, icon: FileText, color: 'bg-blue-500', lightColor: 'bg-blue-50 text-blue-600' },
     { label: 'Projects', value: data.projects.length, icon: Briefcase, color: 'bg-amber-500', lightColor: 'bg-amber-50 text-amber-600' },
     { label: 'Experience', value: data.experience.length, icon: History, color: 'bg-emerald-500', lightColor: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Education', value: data.education?.length || 0, icon: GraduationCap, color: 'bg-cyan-500', lightColor: 'bg-cyan-50 text-cyan-600' },
     { label: 'Certifications', value: data.certifications?.length || 0, icon: Award, color: 'bg-rose-500', lightColor: 'bg-rose-50 text-rose-600' }
   ];
 
@@ -44,6 +48,7 @@ export default function AdminDashboard() {
       case 'pages': return <PagesManager />;
       case 'projects': return <ProjectsManager />;
       case 'experience': return <ExperienceManager />;
+      case 'education': return <EducationManager />;
       case 'certifications': return <CertificationsManager />;
       case 'settings': return <SettingsPanel />;
       default: return <Overview stats={stats} />;
@@ -227,7 +232,7 @@ function Overview({ stats }) {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat, index) => (
           <motion.div
             key={index}
@@ -249,7 +254,7 @@ function Overview({ stats }) {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -287,6 +292,43 @@ function Overview({ stats }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+        >
+          <div className="p-6 border-b border-slate-100">
+            <h3 className="font-bold text-lg flex items-center gap-2">
+              <GraduationCap size={20} className="text-cyan-500" />
+              Education
+            </h3>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {(data.education || []).slice(0, 3).map(edu => (
+              <div key={edu.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                     style={{ backgroundColor: edu.color + '20', color: edu.color }}>
+                  <GraduationCap size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-slate-900 truncate">{edu.degree}</p>
+                  <p className="text-xs text-slate-500">{edu.school}</p>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium shrink-0">
+                  {edu.year}
+                </span>
+              </div>
+            ))}
+            {(!data.education || data.education.length === 0) && (
+              <div className="p-8 text-center text-slate-400">
+                <GraduationCap size={32} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No education entries yet</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
           className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
         >
           <div className="p-6 border-b border-slate-100">

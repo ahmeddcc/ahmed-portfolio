@@ -6,7 +6,7 @@ const DataContext = createContext();
 
 export function DataProvider({ children }) {
   const [data, setData] = useLocalStorage('portfolioData', initialData);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useLocalStorage('isAdmin', false);  // ← تغيير هنا!
   const [adminPassword, setAdminPassword] = useLocalStorage('adminPassword', initialData.settings.password);
   const [toasts, setToasts] = useState([]);
 
@@ -194,12 +194,12 @@ export function DataProvider({ children }) {
       return true;
     }
     return false;
-  }, [adminPassword]);
+  }, [adminPassword, setIsAdmin]);
 
   // تسجيل الخروج
   const logoutAdmin = useCallback(() => {
     setIsAdmin(false);
-  }, []);
+  }, [setIsAdmin]);
 
   const updateCertifications = useCallback((newCerts) => {
     setData(prev => ({

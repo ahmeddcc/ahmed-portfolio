@@ -77,32 +77,58 @@ export default function Home() {
             </motion.div>
 
             {/* Profile Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative flex justify-center lg:justify-end"
-            >
-              <div className="relative">
-                {/* Decorative rings */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary-500/20 to-purple-500/20 
-                              rounded-full blur-xl animate-pulse" />
-                <div className="absolute -inset-8 border border-primary-500/10 rounded-full" />
-                <div className="absolute -inset-12 border border-primary-500/5 rounded-full" />
+<motion.div
+  initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.6, delay: 0.2 }}
+  className="relative flex justify-center lg:justify-end"
+>
+  <div className="relative">
+    {/* Decorative rings */}
+    <div className="absolute -inset-4 bg-gradient-to-r from-primary-500/20 to-purple-500/20 
+                     rounded-full blur-xl animate-pulse" />
+    <div className="absolute -inset-8 border border-primary-500/10 rounded-full" />
+    <div className="absolute -inset-12 border border-primary-500/5 rounded-full" />
 
-                {/* Image container */}
-                <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden 
-                            border-4 border-dark-800 shadow-2xl shadow-primary-500/20">
-                  <img
-                    src={personal.image}
-                    alt={personal.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=Ahmed+Hamed&size=400&background=3b82f6&color=fff';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent" />
-                </div>
+    {/* Image container - MODIFIED */}
+    <div className="relative w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 
+                rounded-full overflow-hidden border-4 border-dark-800 
+                shadow-2xl shadow-primary-500/20 mx-auto">
+      <img
+        src={personal.image}
+        alt={personal.name}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.target.src = 'https://ui-avatars.com/api/?name=Ahmed+Hamed&size=400&background=3b82f6&color=fff';
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent" />
+    </div>
+
+    {/* Floating badges - adjusted positions for mobile */}
+    <motion.div
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 px-3 py-1.5 sm:px-4 sm:py-2 
+               bg-dark-800 rounded-xl border border-dark-700 
+               shadow-xl flex items-center gap-2"
+    >
+      <Code size={14} className="text-primary-400 sm:w-4 sm:h-4" />
+      <span className="text-xs sm:text-sm font-medium">PHP & MySQL</span>
+    </motion.div>
+
+    <motion.div
+      animate={{ y: [0, 10, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 px-3 py-1.5 sm:px-4 sm:py-2 
+               bg-dark-800 rounded-xl border border-dark-700 
+               shadow-xl flex items-center gap-2"
+    >
+      <Briefcase size={14} className="text-green-400 sm:w-4 sm:h-4" />
+      <span className="text-xs sm:text-sm font-medium">20+ Years</span>
+    </motion.div>
+  </div>
+</motion.div>
 
                 {/* Floating badges */}
                 <motion.div

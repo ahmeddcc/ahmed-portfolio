@@ -113,6 +113,39 @@ export function DataProvider({ children }) {
     }));
   }, [setData]);
 
+  // إضافة مهارة
+  const addSkill = useCallback((category, skill) => {
+    setData(prev => ({
+      ...prev,
+      skills: {
+        ...prev.skills,
+        [category]: [...(prev.skills?.[category] || []), { ...skill, id: Date.now() }]
+      }
+    }));
+  }, [setData]);
+
+  // حذف مهارة
+  const deleteSkill = useCallback((skillId, category) => {
+    setData(prev => ({
+      ...prev,
+      skills: {
+        ...prev.skills,
+        [category]: (prev.skills?.[category] || []).filter(s => s.id !== skillId)
+      }
+    }));
+  }, [setData]);
+
+  // تحديث مهارة
+  const updateSkill = useCallback((skillId, category, updates) => {
+    setData(prev => ({
+      ...prev,
+      skills: {
+        ...prev.skills,
+        [category]: (prev.skills?.[category] || []).map(s => s.id === skillId ? { ...s, ...updates } : s)
+      }
+    }));
+  }, [setData]);
+
   // تحديث الإعدادات
   const updateSettings = useCallback((newSettings) => {
     setData(prev => ({
@@ -170,6 +203,9 @@ export function DataProvider({ children }) {
     addEducation,
     deleteEducation,
     updateEducation,
+    addSkill,
+    deleteSkill,
+    updateSkill,
     updateSettings,
     updatePersonal,
     updateCertifications,

@@ -32,10 +32,9 @@ function LoadingScreen() {
   );
 }
 
-function AnimatedRoutes() {
+function PublicRoutes() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
-
+  
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -54,12 +53,23 @@ function AnimatedRoutes() {
             <Route path="/experience" element={<Experience />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Routes>
         </Suspense>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+function AdminRoutes() {
+  const location = useLocation();
+  
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes location={location}>
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      </Routes>
+    </Suspense>
   );
 }
 
@@ -72,7 +82,7 @@ function App() {
       <ScrollToTop />
       {!isAdminRoute && <Navbar />}
       <main className="flex-1">
-        <AnimatedRoutes />
+        {isAdminRoute ? <AdminRoutes /> : <PublicRoutes />}
       </main>
       {!isAdminRoute && <Footer />}
     </div>

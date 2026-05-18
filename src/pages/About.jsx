@@ -28,52 +28,36 @@ export default function About() {
         </AnimatedSection>
 
         <div className="grid lg:grid-cols-3 gap-10 lg:gap-16">
-          {/* Profile Image & Info */}
-          <AnimatedSection variant="slideLeft" className="lg:col-span-1">
-            <div className="sticky top-24">
-              <div className="relative mb-6">
-                <div className="absolute -inset-2 bg-gradient-to-r from-primary-500/20 to-purple-500/20 
-                              rounded-2xl blur-xl" />
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-dark-700 
-                             shadow-2xl">
-                  <img
-                    src={personal.image}
-                    alt={personal.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=Ahmed+Hamed&size=400&background=3b82f6&color=fff';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent" />
-                </div>
-              </div>
+         {/* Profile Image & Info */}
+<<AnimatedSection variant="slideLeft" className="lg:col-span-1">
+  <div className="lg:sticky lg:top-24">
+    <div className="relative mb-6 max-w-xs mx-auto lg:max-w-none">
+      <div className="absolute -inset-2 bg-gradient-to-r from-primary-500/20 to-purple-500/20 
+                       rounded-2xl blur-xl" />
+      <div className="relative aspect-[3/4] max-h-[50vh] lg:max-h-none rounded-2xl overflow-hidden border-2 border-dark-700 
+                   shadow-2xl">
+        <img
+          src={personal.image}
+          alt={personal.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = 'https://ui-avatars.com/api/?name=Ahmed+Hamed&size=400&background=3b82f6&color=fff';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent" />
+      </div>
+    </div>
 
-              <div className="glass-card p-6 space-y-4">
-                <h3 className="text-xl font-bold">{personal.name}</h3>
-                <p className="text-primary-400 text-sm font-medium">{personal.title}</p>
+    <div className="glass-card p-6 space-y-4">
+      <h3 className="text-xl font-bold">{personal.name}</h3>
+      <p className="text-primary-400 text-sm font-medium">{personal.title}</p>
 
-                <div className="space-y-3 pt-4 border-t border-dark-700/50">
-                  <div className="flex items-center gap-3 text-gray-400 text-sm">
-                    <MapPin size={16} className="text-primary-500 shrink-0" />
-                    <span>{personal.location}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-400 text-sm">
-                    <Mail size={16} className="text-primary-500 shrink-0" />
-                    <span>{personal.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-400 text-sm">
-                    <Phone size={16} className="text-primary-500 shrink-0" />
-                    <span>{personal.phone}</span>
-                  </div>
-                  <a href={`https://${personal.linkedin}`} target="_blank" rel="noopener noreferrer"
-                     className="flex items-center gap-3 text-gray-400 hover:text-primary-400 text-sm transition-colors">
-                    <Linkedin size={16} className="text-primary-500 shrink-0" />
-                    <span>LinkedIn Profile</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
+      <div className="space-y-3 pt-4 border-t border-dark-700/50">
+        ...
+      </div>
+    </div>
+  </div>
+</AnimatedSection>
 
           {/* Bio & Details */}
           <div className="lg:col-span-2 space-y-10">

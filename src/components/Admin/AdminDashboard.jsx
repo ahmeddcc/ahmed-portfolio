@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, FileText, Briefcase, History, Settings, LogOut,
@@ -34,8 +34,15 @@ export default function AdminDashboard() {
   const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect if not admin
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, navigate]);
+
   if (!isAdmin) {
-    return <Navigate to="/admin" replace />;
+    return null; // Don't render anything while redirecting
   }
 
   const totalSkills = (data.skills?.development?.length || 0) + 

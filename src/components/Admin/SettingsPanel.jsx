@@ -1,20 +1,42 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Image, Save, CheckCircle, X, Globe, Palette, Shield, User, Mail, Phone, MapPin } from 'lucide-react';
+import { 
+  Lock, Image, Save, CheckCircle, X, Globe, Palette, Shield, User, 
+  Mail, Phone, MapPin, Download, Upload, FileJson
+} from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 
 export default function SettingsPanel() {
-  const { data, updateSettings, updatePersonal } = useData();
+  const { 
+    data, 
+    updateSettings, 
+    updatePersonal, 
+    exportData, 
+    importData,
+    addToast 
+  } = useData();
+  
   const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
   const [passwordStatus, setPasswordStatus] = useState(null);
-  const [imagePreview, setImagePreview] = useState(data.settings.profileImage);
+  
+  // 🛠️ Fixed: Check both settings.profileImage and personal.image for fallback
+  const currentImage = data.personal?.image || data.settings?.profileImage || '';
+  const [imagePreview, setImagePreview] = useState(currentImage);
   const [imageStatus, setImageStatus] = useState(null);
-  const [personalData, setPersonalData] = useState(data.personal);
+  
+  const [personalData, setPersonalData] = useState(data.personal || {});
   const [personalStatus, setPersonalStatus] = useState(null);
+  
+  const [importStatus, setImportStatus] = useState(null);
+  
   const fileInputRef = useRef(null);
+  const importInputRef = useRef(null);
 
   const handlePasswordChange = () => {
-    if (passwordData.current !== data.settings.password) {
+    // 🛠️ Fixed: Compare against data.settings.password (unified source of truth)
+    const currentPassword = data.settings?.password || 'admin';
+    
+    if (passwordData.current !== currentPassword) {
       setPasswordStatus({ type: 'error', message: 'Current password is incorrect' });
       return;
     }
@@ -26,6 +48,8 @@ export default function SettingsPanel() {
       setPasswordStatus({ type: 'error', message: 'Password must be at least 4 characters' });
       return;
     }
+    
+    // 🛠️ Fixed: Only updateSettings — DataContext handles the rest
     updateSettings({ password: passwordData.new });
     setPasswordStatus({ type: 'success', message: 'Password updated successfully!' });
     setPasswordData({ current: '', new: '', confirm: '' });
@@ -45,10 +69,14 @@ export default function SettingsPanel() {
     reader.onload = (event) => {
       const result = event.target.result;
       setImagePreview(result);
+      // 🛠️ Fixed: Update both settings and personal image fields
       updateSettings({ profileImage: result });
       updatePersonal({ image: result });
       setImageStatus({ type: 'success', message: 'Image uploaded successfully!' });
       setTimeout(() => setImageStatus(null), 3000);
+    };
+    reader.onerror = () => {
+      setImageStatus({ type: 'error', message: 'Failed to read image file' });
     };
     reader.readAsDataURL(file);
   };
@@ -57,6 +85,32 @@ export default function SettingsPanel() {
     updatePersonal(personalData);
     setPersonalStatus({ type: 'success', message: 'Personal information updated!' });
     setTimeout(() => setPersonalStatus(null), 3000);
+  };
+
+  // 🛠️ Fixed: Import handler using DataContext importData
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const success = importData(event.target.result);
+      if (success) {
+        setImportStatus({ type: 'success', message: 'Data imported successfully!' });
+        // Refresh local preview state
+        setImagePreview(data.personal?.image || data.settings?.profileImage || '');
+        setPersonalData(data.personal || {});
+      }
+      setTimeout(() => setImportStatus(null), 3000);
+    };
+    reader.onerror = () => {
+      setImportStatus({ type: 'error', message: 'Failed to read import file' });
+      setTimeout(() => setImportStatus(null), 3000);
+    };
+    reader.readAsText(file);
+    
+    // Reset input so same file can be selected again
+    e.target.value = '';
   };
 
   return (
@@ -91,7 +145,7 @@ export default function SettingsPanel() {
                 <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  value={personalData.name}
+                  value={personalData.name || ''}
                   onChange={e => setPersonalData({...personalData, name: e.target.value})}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 />
@@ -101,7 +155,7 @@ export default function SettingsPanel() {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Title</label>
               <input
                 type="text"
-                value={personalData.title}
+                value={personalData.title || ''}
                 onChange={e => setPersonalData({...personalData, title: e.target.value})}
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               />
@@ -112,7 +166,7 @@ export default function SettingsPanel() {
                 <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
-                  value={personalData.email}
+                  value={personalData.email || ''}
                   onChange={e => setPersonalData({...personalData, email: e.target.value})}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 />
@@ -124,7 +178,7 @@ export default function SettingsPanel() {
                 <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  value={personalData.phone}
+                  value={personalData.phone || ''}
                   onChange={e => setPersonalData({...personalData, phone: e.target.value})}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 />
@@ -136,7 +190,7 @@ export default function SettingsPanel() {
                 <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  value={personalData.location}
+                  value={personalData.location || ''}
                   onChange={e => setPersonalData({...personalData, location: e.target.value})}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 />
@@ -188,15 +242,23 @@ export default function SettingsPanel() {
         <div className="p-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative shrink-0">
-              <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg">
-                <img 
-                  src={imagePreview} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'https://ui-avatars.com/api/?name=Ahmed+Hamed&size=200&background=3b82f6&color=fff';
-                  }}
-                />
+              <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg bg-slate-100 flex items-center justify-center">
+                {imagePreview ? (
+                  <img 
+                    src={imagePreview} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`w-full h-full items-center justify-center bg-slate-100 ${imagePreview ? 'hidden' : 'flex'}`}
+                >
+                  <User size={48} className="text-slate-400" />
+                </div>
               </div>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -318,6 +380,70 @@ export default function SettingsPanel() {
         </div>
       </motion.div>
 
+      {/* 🛠️ Fixed: Data Backup & Restore */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+      >
+        <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <FileJson size={20} className="text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg text-slate-900">Data Backup</h3>
+              <p className="text-sm text-slate-500">Export or import your portfolio data</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={exportData}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-emerald-500/20"
+            >
+              <Download size={18} />
+              Export Data (JSON)
+            </button>
+            
+            <button
+              onClick={() => importInputRef.current?.click()}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-blue-500/20"
+            >
+              <Upload size={18} />
+              Import Data (JSON)
+            </button>
+            
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </div>
+          
+          <p className="text-xs text-slate-500 mt-3">
+            Export creates a backup of all your portfolio data. Import restores data from a previously exported JSON file.
+          </p>
+
+          {importStatus && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mt-3 flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl ${
+                importStatus.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+              }`}
+            >
+              {importStatus.type === 'success' ? <CheckCircle size={16} /> : <X size={16} />}
+              {importStatus.message}
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
+
       {/* Site Info */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -343,14 +469,14 @@ export default function SettingsPanel() {
                 <Globe size={16} className="text-blue-500" />
                 <span className="text-xs font-medium text-slate-500 uppercase">Site Title</span>
               </div>
-              <p className="font-semibold text-slate-900">{data.settings.siteTitle}</p>
+              <p className="font-semibold text-slate-900">{data.settings?.siteTitle || 'Portfolio'}</p>
             </div>
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
               <div className="flex items-center gap-2 mb-2">
                 <Palette size={16} className="text-purple-500" />
                 <span className="text-xs font-medium text-slate-500 uppercase">Theme</span>
               </div>
-              <p className="font-semibold text-slate-900 capitalize">{data.settings.theme}</p>
+              <p className="font-semibold text-slate-900 capitalize">{data.settings?.theme || 'default'}</p>
             </div>
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
               <div className="flex items-center gap-2 mb-2">
@@ -364,21 +490,21 @@ export default function SettingsPanel() {
                 <User size={16} className="text-indigo-500" />
                 <span className="text-xs font-medium text-slate-500 uppercase">Total Pages</span>
               </div>
-              <p className="font-semibold text-slate-900">{data.pages.length}</p>
+              <p className="font-semibold text-slate-900">{data.pages?.length || 0}</p>
             </div>
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
               <div className="flex items-center gap-2 mb-2">
                 <Image size={16} className="text-amber-500" />
                 <span className="text-xs font-medium text-slate-500 uppercase">Projects</span>
               </div>
-              <p className="font-semibold text-slate-900">{data.projects.length}</p>
+              <p className="font-semibold text-slate-900">{data.projects?.length || 0}</p>
             </div>
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
               <div className="flex items-center gap-2 mb-2">
                 <Lock size={16} className="text-rose-500" />
                 <span className="text-xs font-medium text-slate-500 uppercase">Experience</span>
               </div>
-              <p className="font-semibold text-slate-900">{data.experience.length}</p>
+              <p className="font-semibold text-slate-900">{data.experience?.length || 0}</p>
             </div>
           </div>
         </div>

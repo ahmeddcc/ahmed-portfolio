@@ -5,7 +5,8 @@ import { useData } from '../../context/DataContext.jsx';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function CertificationsManager() {
-  const { data, updateData, addToast } = useData();
+  // 🛠️ Fixed: Using dedicated certification functions instead of generic updateData
+  const { data, addCertification, updateCertification, deleteCertification, addToast } = useData();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, certId: null, certName: '' });
@@ -22,17 +23,16 @@ export default function CertificationsManager() {
       addToast('error', 'Certification name and center are required');
       return;
     }
-    const newId = Date.now();
-    const updatedCerts = [...certifications, { ...newCert, id: newId }];
-    updateData('certifications', updatedCerts);
+    // 🛠️ Fixed: Using addCertification instead of manual updateData
+    addCertification(newCert);
     addToast('success', 'Certification added successfully', `"${newCert.name}" has been added.`);
     setNewCert({ name: '', date: '', center: '', certId: '', icon: 'Award' });
     setIsAdding(false);
   };
 
   const handleUpdate = (id) => {
-    const updatedCerts = certifications.map(c => c.id === id ? { ...c, ...editCert } : c);
-    updateData('certifications', updatedCerts);
+    // 🛠️ Fixed: Using updateCertification instead of manual array mapping + updateData
+    updateCertification(id, editCert);
     addToast('success', 'Certification updated successfully', `Changes have been saved.`);
     setEditingId(null);
     setEditCert({});
@@ -47,8 +47,8 @@ export default function CertificationsManager() {
   };
 
   const handleDelete = () => {
-    const updatedCerts = certifications.filter(c => c.id !== confirmDelete.certId);
-    updateData('certifications', updatedCerts);
+    // 🛠️ Fixed: Using deleteCertification instead of manual filter + updateData
+    deleteCertification(confirmDelete.certId);
     addToast('success', 'Certification deleted', `"${confirmDelete.certName}" has been removed.`);
     closeDeleteConfirm();
   };

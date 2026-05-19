@@ -3,23 +3,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, Check } from 'lucide-react';
 
 export default function ConfirmDialog({ isOpen, onClose, onConfirm, title, message, itemName }) {
-  if (!isOpen) return null;
+  // ❌ Removed: if (!isOpen) return null;
+  // AnimatePresence needs the component to stay mounted to handle exit animations
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
+            key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
             <motion.div
+              key="dialog"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
             >

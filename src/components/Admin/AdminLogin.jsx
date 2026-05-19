@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Shield, Lock, Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 
 export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { loginAdmin } = useData();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (loginAdmin(password)) {
+    setIsLoading(true);
+
+    // Small delay for UX feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const success = loginAdmin(password);
+    setIsLoading(false);
+
+    if (success) {
       navigate('/admin/dashboard');
     } else {
       setError('Invalid password. Please try again.');
+      setPassword('');
     }
   };
 
@@ -57,14 +67,16 @@ export default function AdminLogin() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={isLoading}
+                  className="w-full pl-11 pr-11 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
                   placeholder="Enter admin password"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  disabled={isLoading}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors disabled:opacity-50"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -84,14 +96,26 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98]"
+              disabled={!password.trim() || isLoading}
+              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Access Dashboard
+              {isLoading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Access Dashboard'
+              )}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-800 text-center">
-            <button onClick={() => navigate('/')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
+            <button 
+              onClick={() => navigate('/')} 
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors disabled:opacity-50"
+            >
               <ArrowLeft size={16} />
               Back to Portfolio
             </button>

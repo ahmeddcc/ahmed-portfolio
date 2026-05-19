@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Layout/Navbar.jsx';
 import Footer from './components/Layout/Footer.jsx';
@@ -63,14 +63,23 @@ function PublicRoutes() {
 
 function AdminRoutes() {
   const location = useLocation();
-  const { isAdmin } = useData();
+  const navigate = useNavigate();
+  const { isAdmin, logoutAdmin } = useData();
   
+  // 🔒 Security Fix: Auto-redirect if session expires while on admin pages
+  useEffect(() => {
+    if (!isAdmin && location.pathname.startsWith('/admin/dashboard')) {
+      logoutAdmin();
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, location.pathname, logoutAdmin, navigate]);
+
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes location={location}>
         <Route path="/admin" element={<AdminLogin />} />
         <Route 
-          path="/admin/dashboard" 
+          path="/admin/dashboard/*" 
           element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin" replace />} 
         />
       </Routes>

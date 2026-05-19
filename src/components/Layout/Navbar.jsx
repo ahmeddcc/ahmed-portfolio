@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, User, Briefcase, History, Zap, Mail, Menu, X, Shield, ChevronDown 
+  Home, User, Briefcase, History, Zap, Mail, Menu, X
 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 
 const iconMap = {
-  Home, User, Briefcase, History, Zap, Mail, Shield
+  Home, User, Briefcase, History, Zap, Mail
 };
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { data, isAdmin, logoutAdmin } = useData();
+  const { data } = useData();
 
   const visiblePages = data.pages.filter(p => p.visible).sort((a, b) => a.order - b.order);
 
@@ -87,17 +87,6 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-
-              {isAdmin && (
-                <Link
-                  to="/admin/dashboard"
-                  className="ml-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary-600/20 
-                           text-primary-400 hover:bg-primary-600/30 transition-all flex items-center gap-2"
-                >
-                  <Shield size={16} />
-                  Admin
-                </Link>
-              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -146,35 +135,6 @@ export default function Navbar() {
                   </motion.div>
                 );
               })}
-
-              {isAdmin ? (
-                <>
-                  <Link
-                    to="/admin/dashboard"
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
-                             bg-primary-600/20 text-primary-400"
-                  >
-                    <Shield size={18} />
-                    Admin Dashboard
-                  </Link>
-                  <button
-                    onClick={logoutAdmin}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
-                             text-red-400 hover:bg-red-500/10"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
-                           text-gray-500 hover:text-gray-300"
-                >
-                  <Shield size={18} />
-                  Admin Login
-                </Link>
-              )}
             </div>
           </motion.div>
         )}

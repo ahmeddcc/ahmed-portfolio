@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Edit3, Save, X, History, Wrench, Briefcase, Calendar, MapPin } from 'lucide-react';
+import { 
+  Plus, Trash2, Edit3, Save, X, History, Wrench, Briefcase, Calendar, MapPin,
+  Satellite, Database, GraduationCap, Monitor, Code, Server
+} from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 import ConfirmDialog from './ConfirmDialog';
+
+// 🛠️ Fixed: Icon mapping for dynamic rendering
+const iconMap = {
+  Wrench,
+  Satellite,
+  Database,
+  GraduationCap,
+  Briefcase,
+  Monitor,
+  Code,
+  Server
+};
 
 const iconOptions = [
   { value: 'Wrench', label: 'Wrench' },
@@ -219,150 +234,156 @@ export default function ExperienceManager() {
 
         {/* Experience List */}
         <div className="space-y-4">
-          {data.experience.map((exp) => (
-            <motion.div
-              key={exp.id}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              {editingId === exp.id ? (
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-slate-900">Edit Experience</h3>
-                    <button onClick={() => { setEditingId(null); setEditExp({}); }}
-                      className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600"><X size={18} /></button>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <input type="text" value={editExp.title ?? exp.title}
-                      onChange={e => setEditExp({...editExp, title: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Title" />
-                    <input type="text" value={editExp.company ?? exp.company}
-                      onChange={e => setEditExp({...editExp, company: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Company" />
-                    <input type="text" value={editExp.location ?? exp.location}
-                      onChange={e => setEditExp({...editExp, location: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Location" />
-                    <input type="text" value={editExp.period ?? exp.period}
-                      onChange={e => setEditExp({...editExp, period: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Period" />
-                    <input type="text" value={editExp.duration ?? exp.duration}
-                      onChange={e => setEditExp({...editExp, duration: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Duration" />
-                    <select value={editExp.icon ?? exp.icon}
-                      onChange={e => setEditExp({...editExp, icon: e.target.value})}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                      {iconOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                    </select>
-                  </div>
+          {data.experience.map((exp) => {
+            // 🛠️ Fixed: Dynamic icon rendering
+            const IconComponent = iconMap[exp.icon] || Wrench;
+            
+            return (
+              <motion.div
+                key={exp.id}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
+                {editingId === exp.id ? (
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-slate-900">Edit Experience</h3>
+                      <button onClick={() => { setEditingId(null); setEditExp({}); }}
+                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600"><X size={18} /></button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <input type="text" value={editExp.title ?? exp.title}
+                        onChange={e => setEditExp({...editExp, title: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Title" />
+                      <input type="text" value={editExp.company ?? exp.company}
+                        onChange={e => setEditExp({...editExp, company: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Company" />
+                      <input type="text" value={editExp.location ?? exp.location}
+                        onChange={e => setEditExp({...editExp, location: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Location" />
+                      <input type="text" value={editExp.period ?? exp.period}
+                        onChange={e => setEditExp({...editExp, period: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Period" />
+                      <input type="text" value={editExp.duration ?? exp.duration}
+                        onChange={e => setEditExp({...editExp, duration: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Duration" />
+                      <select value={editExp.icon ?? exp.icon}
+                        onChange={e => setEditExp({...editExp, icon: e.target.value})}
+                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        {iconOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Color</label>
-                    <div className="flex gap-2 flex-wrap">
-                      {colorOptions.map(c => (
-                        <button key={c} onClick={() => setEditExp({...editExp, color: c})}
-                          className={`w-8 h-8 rounded-lg border-2 transition-all ${(editExp.color ?? exp.color) === c ? 'border-slate-900 scale-110' : 'border-transparent'}`}
-                          style={{ backgroundColor: c }} />
-                      ))}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Color</label>
+                      <div className="flex gap-2 flex-wrap">
+                        {colorOptions.map(c => (
+                          <button key={c} onClick={() => setEditExp({...editExp, color: c})}
+                            className={`w-8 h-8 rounded-lg border-2 transition-all ${(editExp.color ?? exp.color) === c ? 'border-slate-900 scale-110' : 'border-transparent'}`}
+                            style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                    </div>
+
+                    <textarea value={editExp.description ?? exp.description} rows={3}
+                      onChange={e => setEditExp({...editExp, description: e.target.value})}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
+
+                    {/* Edit Achievements */}
+                    <div>
+                      <div className="flex gap-2 mb-2">
+                        <input type="text" value={editAchievement}
+                          onChange={e => setEditAchievement(e.target.value)}
+                          onKeyPress={e => e.key === 'Enter' && addAchievement(true)}
+                          className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Add achievement..." />
+                        <button onClick={() => addAchievement(true)}
+                          className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors">Add</button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(editExp.achievements || exp.achievements).map((a, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm">
+                            {a}
+                            <button onClick={() => removeAchievement(exp.id, i, true)} className="hover:text-red-500"><X size={14} /></button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button onClick={() => handleUpdate(exp.id)}
+                        className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2">
+                        <Save size={16} /> Save Changes
+                      </button>
+                      <button onClick={() => { setEditingId(null); setEditExp({}); }}
+                        className="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-medium transition-all">
+                        Cancel
+                      </button>
                     </div>
                   </div>
-
-                  <textarea value={editExp.description ?? exp.description} rows={3}
-                    onChange={e => setEditExp({...editExp, description: e.target.value})}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
-
-                  {/* Edit Achievements */}
-                  <div>
-                    <div className="flex gap-2 mb-2">
-                      <input type="text" value={editAchievement}
-                        onChange={e => setEditAchievement(e.target.value)}
-                        onKeyPress={e => e.key === 'Enter' && addAchievement(true)}
-                        className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Add achievement..." />
-                      <button onClick={() => addAchievement(true)}
-                        className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors">Add</button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {(editExp.achievements || exp.achievements).map((a, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm">
-                          {a}
-                          <button onClick={() => removeAchievement(exp.id, i, true)} className="hover:text-red-500"><X size={14} /></button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button onClick={() => handleUpdate(exp.id)}
-                      className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2">
-                      <Save size={16} /> Save Changes
-                    </button>
-                    <button onClick={() => { setEditingId(null); setEditExp({}); }}
-                      className="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-medium transition-all">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-5">
-                  <div className="flex flex-col sm:flex-row items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: exp.color + '15', color: exp.color, border: `2px solid ${exp.color}30` }}>
-                      <Wrench size={20} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                        <div>
-                          <h4 className="font-semibold text-lg text-slate-900">{exp.title}</h4>
-                          <p className="text-sm text-slate-500">{exp.company}</p>
-                          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
-                            <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
-                            <span className="flex items-center gap-1"><History size={12} /> {exp.duration}</span>
-                            <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
+                ) : (
+                  <div className="p-5">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: exp.color + '15', color: exp.color, border: `2px solid ${exp.color}30` }}>
+                        {/* 🛠️ Fixed: Dynamic icon instead of hardcoded Wrench */}
+                        <IconComponent size={20} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div>
+                            <h4 className="font-semibold text-lg text-slate-900">{exp.title}</h4>
+                            <p className="text-sm text-slate-500">{exp.company}</p>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
+                              <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
+                              <span className="flex items-center gap-1"><History size={12} /> {exp.duration}</span>
+                              <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button onClick={() => { setEditingId(exp.id); setEditExp({}); }}
+                              className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"><Edit3 size={16} /></button>
+                            <button onClick={() => openDeleteConfirm(exp)}
+                              className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={16} /></button>
+                            <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
+                              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+                              {expandedId === exp.id ? <X size={16} /> : <History size={16} />}
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button onClick={() => { setEditingId(exp.id); setEditExp({}); }}
-                            className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"><Edit3 size={16} /></button>
-                          <button onClick={() => openDeleteConfirm(exp)}
-                            className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={16} /></button>
-                          <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
-                            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
-                            {expandedId === exp.id ? <X size={16} /> : <History size={16} />}
-                          </button>
-                        </div>
+                        <p className="text-sm text-slate-600 mt-2 line-clamp-2">{exp.description}</p>
                       </div>
-                      <p className="text-sm text-slate-600 mt-2 line-clamp-2">{exp.description}</p>
                     </div>
-                  </div>
 
-                  <AnimatePresence>
-                    {expandedId === exp.id && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-4 pt-4 border-t border-slate-100">
-                          <h5 className="text-sm font-semibold text-slate-700 mb-2">Key Achievements</h5>
-                          <ul className="space-y-1.5">
-                            {exp.achievements.map((a, i) => (
-                              <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                                {a}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-            </motion.div>
-          ))}
+                    <AnimatePresence>
+                      {expandedId === exp.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mt-4 pt-4 border-t border-slate-100">
+                            <h5 className="text-sm font-semibold text-slate-700 mb-2">Key Achievements</h5>
+                            <ul className="space-y-1.5">
+                              {exp.achievements.map((a, i) => (
+                                <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                                  {a}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
 
         {data.experience.length === 0 && (

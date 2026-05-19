@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, FileText, Briefcase, History, Settings, LogOut,
   ChevronRight, Menu, X, Award, Shield, User, Bell, Moon, Sun,
-  GraduationCap, Zap
+  GraduationCap, Zap, CheckCircle
 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
+import { useLocalStorage } from '../../hooks/useLocalStorage.js';
 import PagesManager from './PagesManager.jsx';
 import ProjectsManager from './ProjectsManager.jsx';
 import ExperienceManager from './ExperienceManager.jsx';
@@ -31,8 +32,31 @@ export default function AdminDashboard() {
   const { isAdmin, logoutAdmin, data, toasts, removeToast } = useData();
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  
+  // 🌙 Dark Mode — Fixed: Persisted in localStorage + applied to <html>
+  const [darkMode, setDarkMode] = useLocalStorage('adminDarkMode', false);
+  
+  // 🔔 Notifications — Fixed: Real dropdown instead of static red dot
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef(null);
+  
   const navigate = useNavigate();
+
+  // Apply dark mode class to <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Redirect if not admin
   useEffect(() => {
@@ -42,7 +66,7 @@ export default function AdminDashboard() {
   }, [isAdmin, navigate]);
 
   if (!isAdmin) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
 
   const totalSkills = (data.skills?.development?.length || 0) + 
@@ -56,6 +80,12 @@ export default function AdminDashboard() {
     { label: 'Education', value: data.education?.length || 0, icon: GraduationCap, color: 'bg-cyan-500', lightColor: 'bg-cyan-50 text-cyan-600' },
     { label: 'Skills', value: totalSkills, icon: Zap, color: 'bg-purple-500', lightColor: 'bg-purple-50 text-purple-600' },
     { label: 'Certifications', value: data.certifications?.length || 0, icon: Award, color: 'bg-rose-500', lightColor: 'bg-rose-50 text-rose-600' }
+  ];
+
+  // Sample notifications (can be replaced with real data later)
+  const notifications = [
+    { id: 1, title: 'Welcome to Admin Panel', time: 'Just now', read: false },
+    { id: 2, title: 'Portfolio data loaded successfully', time: '2 min ago', read: true },
   ];
 
   const renderContent = () => {
@@ -74,7 +104,7 @@ export default function AdminDashboard() {
   const activeTabData = tabs.find(t => t.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+    <div className={`min-h-screen flex font-sans ${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       {/* Toast Notifications */}
       <Toast toasts={toasts} removeToast={removeToast} />
 
@@ -93,10 +123,10 @@ export default function AdminDashboard() {
 
       {/* Sidebar */}
       <motion.aside
-        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-white border-r border-slate-200 flex flex-col shadow-2xl lg:shadow-none transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 border-r flex flex-col shadow-2xl lg:shadow-none transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
       >
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-slate-100 bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className={`p-6 border-b ${darkMode ? 'border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900' : 'border-slate-100 bg-gradient-to-br from-slate-900 to-slate-800'}`}>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
               AH
@@ -112,13 +142,13 @@ export default function AdminDashboard() {
         </div>
 
         {/* User Info */}
-        <div className="px-6 py-4 border-b border-slate-100">
+        <div className={`px-6 py-4 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-blue-600 font-bold text-sm border-2 border-blue-200">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${darkMode ? 'bg-gradient-to-br from-blue-900 to-indigo-900 text-blue-400 border-blue-800' : 'bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 border-blue-200'}`}>
               {data.personal.name.split(' ').map(n => n[0]).join('')}
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-slate-900 truncate">{data.personal.name}</p>
+              <p className={`font-semibold text-sm truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{data.personal.name}</p>
               <p className="text-xs text-slate-500 truncate">{data.personal.email}</p>
             </div>
           </div>
@@ -137,7 +167,9 @@ export default function AdminDashboard() {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                   isActive
                     ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/25'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    : darkMode 
+                      ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
@@ -153,10 +185,12 @@ export default function AdminDashboard() {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-slate-100 space-y-2">
+        <div className={`p-4 border-t space-y-2 ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              darkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+            }`}
           >
             {darkMode ? <Sun size={16} /> : <Moon size={16} />}
             {darkMode ? 'Light Mode' : 'Dark Mode'}
@@ -174,14 +208,14 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
+        <header className={`sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-4 border-b ${darkMode ? 'bg-slate-900/80 border-slate-800 backdrop-blur-xl' : 'bg-white/80 border-slate-200 backdrop-blur-xl'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2.5 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200"
+                className={`lg:hidden p-2.5 rounded-xl transition-colors border ${darkMode ? 'hover:bg-slate-800 border-slate-700' : 'hover:bg-slate-100 border-slate-200'}`}
               >
-                <Menu size={20} />
+                <Menu size={20} className={darkMode ? 'text-slate-300' : 'text-slate-700'} />
               </button>
               <div>
                 <div className="flex items-center gap-2">
@@ -190,9 +224,9 @@ export default function AdminDashboard() {
                       <activeTabData.icon size={16} />
                     </div>
                   )}
-                  <h2 className="text-xl font-bold text-slate-900 capitalize">{activeTab}</h2>
+                  <h2 className={`text-xl font-bold capitalize ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{activeTab}</h2>
                 </div>
-                <p className="text-sm text-slate-500 hidden sm:block mt-0.5">Manage your portfolio content</p>
+                <p className={`text-sm hidden sm:block mt-0.5 ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>Manage your portfolio content</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -200,10 +234,55 @@ export default function AdminDashboard() {
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 Online
               </div>
-              <button className="p-2.5 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200 relative">
-                <Bell size={18} className="text-slate-600" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-white" />
-              </button>
+              
+              {/* 🔔 Notifications — Fixed: Real dropdown */}
+              <div className="relative" ref={notifRef}>
+                <button 
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  className={`p-2.5 rounded-xl transition-colors border relative ${darkMode ? 'hover:bg-slate-800 border-slate-700' : 'hover:bg-slate-100 border-slate-200'}`}
+                >
+                  <Bell size={18} className={darkMode ? 'text-slate-400' : 'text-slate-600'} />
+                  {notifications.some(n => !n.read) && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-white dark:border-slate-900" />
+                  )}
+                </button>
+                
+                <AnimatePresence>
+                  {notifOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className={`absolute right-0 mt-2 w-80 rounded-xl shadow-xl border z-50 overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}
+                    >
+                      <div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                        <h3 className={`font-semibold text-sm ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Notifications</h3>
+                        <span className="text-xs text-slate-500">{notifications.filter(n => !n.read).length} new</span>
+                      </div>
+                      <div className="max-h-64 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-6 text-center">
+                            <Bell size={24} className="mx-auto mb-2 text-slate-400" />
+                            <p className={`text-sm ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>No notifications</p>
+                          </div>
+                        ) : (
+                          notifications.map(notif => (
+                            <div key={notif.id} className={`flex items-start gap-3 px-4 py-3 border-b last:border-0 transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-50 hover:bg-slate-50'} ${!notif.read ? (darkMode ? 'bg-slate-800/50' : 'bg-blue-50/50') : ''}`}>
+                              <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!notif.read ? 'bg-blue-500' : 'bg-slate-300'}`} />
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>{notif.title}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">{notif.time}</p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
                 {data.personal.name.split(' ').map(n => n[0]).join('')}
               </div>
@@ -228,7 +307,7 @@ export default function AdminDashboard() {
 }
 
 function Overview({ stats }) {
-  const { data } = useData();
+  const { data, darkMode } = useData();
 
   return (
     <div className="space-y-8">
@@ -236,7 +315,7 @@ function Overview({ stats }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 rounded-2xl p-8 text-white relative overflow-hidden"
+        className={`rounded-2xl p-8 text-white relative overflow-hidden ${darkMode ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950' : 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900'}`}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -250,7 +329,7 @@ function Overview({ stats }) {
         </div>
       </motion.div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — Fixed: Removed misleading "+0" */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {stats.map((stat, index) => (
           <motion.div
@@ -258,16 +337,16 @@ function Overview({ stats }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow group"
+            className={`rounded-2xl border p-6 shadow-sm hover:shadow-md transition-shadow group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`w-12 h-12 rounded-xl ${stat.lightColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <stat.icon size={24} />
               </div>
-              <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full">+0</span>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>Total</span>
             </div>
-            <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
-            <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{stat.value}</p>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>{stat.label}</p>
           </motion.div>
         ))}
       </div>
@@ -278,23 +357,23 @@ function Overview({ stats }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+          className={`rounded-2xl border shadow-sm overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
         >
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-lg flex items-center gap-2">
+          <div className={`p-6 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+            <h3 className={`font-bold text-lg flex items-center gap-2 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>
               <Briefcase size={20} className="text-amber-500" />
               Recent Projects
             </h3>
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className={`divide-y ${darkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
             {data.projects.slice(0, 3).map(project => (
-              <div key={project.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
+              <div key={project.id} className={`flex items-center gap-4 p-4 transition-colors ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0"
                      style={{ backgroundColor: project.color }}>
                   {project.title.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-slate-900 truncate">{project.title}</p>
+                  <p className={`font-medium text-sm truncate ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>{project.title}</p>
                   <p className="text-xs text-slate-500">{project.type}</p>
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${
@@ -311,26 +390,26 @@ function Overview({ stats }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+          className={`rounded-2xl border shadow-sm overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
         >
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-lg flex items-center gap-2">
+          <div className={`p-6 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+            <h3 className={`font-bold text-lg flex items-center gap-2 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>
               <GraduationCap size={20} className="text-cyan-500" />
               Education
             </h3>
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className={`divide-y ${darkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
             {(data.education || []).slice(0, 3).map(edu => (
-              <div key={edu.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
+              <div key={edu.id} className={`flex items-center gap-4 p-4 transition-colors ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                      style={{ backgroundColor: edu.color + '20', color: edu.color }}>
                   <GraduationCap size={20} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-slate-900 truncate">{edu.degree}</p>
+                  <p className={`font-medium text-sm truncate ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>{edu.degree}</p>
                   <p className="text-xs text-slate-500">{edu.school}</p>
                 </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium shrink-0">
+                <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>
                   {edu.year}
                 </span>
               </div>
@@ -348,25 +427,25 @@ function Overview({ stats }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+          className={`rounded-2xl border shadow-sm overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
         >
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-lg flex items-center gap-2">
+          <div className={`p-6 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+            <h3 className={`font-bold text-lg flex items-center gap-2 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>
               <Award size={20} className="text-rose-500" />
               Certifications
             </h3>
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className={`divide-y ${darkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
             {(data.certifications || []).slice(0, 3).map(cert => (
-              <div key={cert.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
+              <div key={cert.id} className={`flex items-center gap-4 p-4 transition-colors ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${darkMode ? 'bg-rose-900/30' : 'bg-rose-50'}`}>
                   <Award size={20} className="text-rose-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-slate-900 truncate">{cert.name}</p>
+                  <p className={`font-medium text-sm truncate ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>{cert.name}</p>
                   <p className="text-xs text-slate-500">{cert.date}</p>
                 </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium shrink-0">
+                <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>
                   {cert.certId}
                 </span>
               </div>

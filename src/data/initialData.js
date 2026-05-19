@@ -41,7 +41,8 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       ],
       color: "#6366f1",
       image: "/assets/projects/puzzle-key.jpg",
-      link: "#"
+      link: "#",
+      liveUrl: ""              // ← جديد: رابط المشروع الحي
     },
     {
       id: 2,
@@ -62,7 +63,8 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       ],
       color: "#f59e0b",
       image: "/assets/projects/tick-sys.jpg",
-      link: "#"
+      link: "#",
+      liveUrl: ""              // ← جديد
     },
     {
       id: 3,
@@ -80,7 +82,8 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       ],
       color: "#10b981",
       image: "/assets/projects/moussa.jpg",
-      link: "#"
+      link: "#",
+      liveUrl: ""              // ← جديد
     },
     {
       id: 4,
@@ -98,7 +101,8 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       ],
       color: "#3b82f6",
       image: "/assets/projects/almuwafi.jpg",
-      link: "#"
+      link: "#",
+      liveUrl: "https://almuwafi.com"   // ← مثال: أضف الرابط الحقيقي
     },
     {
       id: 5,
@@ -116,7 +120,8 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       ],
       color: "#ec4899",
       image: "/assets/projects/books.jpg",
-      link: "#"
+      link: "#",
+      liveUrl: "https://amazon.com/..."   // ← مثال: رابط Amazon KDP
     }
   ],
 

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Trash2, Edit3, Save, X, Briefcase, ChevronRight, ChevronLeft,
-  Link, Image, ExternalLink, Layers, Calendar, Code2, Globe
+  Link, Image, ExternalLink, Layers, Calendar, Code2, Globe, Palette
 } from 'lucide-react';
 import { useData } from '../../context/DataContext.jsx';
 import ConfirmDialog from './ConfirmDialog';
@@ -339,12 +339,15 @@ export default function ProjectsManager() {
                     src={project.image} 
                     alt={project.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentNode.querySelector('.fallback-icon').style.display = 'flex';
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Code2 size={40} style={{ color: project.color }} className="opacity-30" />
-                  </div>
-                )}
+                ) : null}
+                <div className="fallback-icon w-full h-full flex items-center justify-center" style={{ display: project.image ? 'none' : 'flex' }}>
+                  <Code2 size={40} style={{ color: project.color }} className="opacity-30" />
+                </div>
                 <div className="absolute top-2 right-2">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium backdrop-blur-sm ${
                     project.status === 'Live' ? 'bg-green-500/20 text-green-700' :
@@ -447,15 +450,18 @@ export default function ProjectsManager() {
                       src={selectedProject.image} 
                       alt={selectedProject.title} 
                       className="w-full h-56 object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentNode.querySelector('.fallback-icon').style.display = 'flex';
+                      }}
                     />
-                  ) : (
-                    <div 
-                      className="w-full h-56 flex items-center justify-center"
-                      style={{ backgroundColor: selectedProject.color + '15' }}
-                    >
-                      <Code2 size={64} style={{ color: selectedProject.color }} className="opacity-30" />
-                    </div>
-                  )}
+                  ) : null}
+                  <div
+                    className="fallback-icon w-full h-56 flex items-center justify-center"
+                    style={{ backgroundColor: selectedProject.color + '15', display: selectedProject.image ? 'none' : 'flex' }}
+                  >
+                    <Code2 size={64} style={{ color: selectedProject.color }} className="opacity-30" />
+                  </div>
                 </motion.div>
 
                 {/* Title Section */}
@@ -497,7 +503,7 @@ export default function ProjectsManager() {
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <div className="flex items-center gap-2 text-slate-400 mb-1">
                       <Palette size={14} />
-                      <span className="text-xs font-medium uppercase">Type</span>
+                      <span className="text-xs font-medium uppercase">Style</span>
                     </div>
                     <p className="text-sm font-semibold text-slate-700">{selectedProject.type}</p>
                   </div>

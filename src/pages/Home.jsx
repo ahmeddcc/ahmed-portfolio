@@ -193,7 +193,20 @@ export default function Home() {
                   <div className="glass-card overflow-hidden hover-lift h-full">
                     <div className="h-48 bg-gradient-to-br from-dark-700 to-dark-800 relative overflow-hidden">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Briefcase size={48} className="text-gray-600" />
+                        {project.image ? (
+                          <img
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className={`flex items-center justify-center w-full h-full ${project.image ? 'hidden' : ''}`}>
+                          <Briefcase size={48} className="text-gray-600" />
+                        </div>
                       </div>
                       <div 
                         className="absolute inset-0 opacity-20"

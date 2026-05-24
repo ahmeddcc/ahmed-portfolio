@@ -77,7 +77,20 @@ export default function Projects() {
                       style={{ backgroundColor: project.color }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-6xl font-bold text-white/10">{project.title.charAt(0)}</span>
+                      {project.image ? (
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`flex items-center justify-center w-full h-full ${project.image ? 'hidden' : ''}`}>
+                         <span className="text-6xl font-bold text-white/10">{project.title.charAt(0)}</span>
+                      </div>
                     </div>
 
                     {/* Status Badge */}
@@ -138,15 +151,23 @@ export default function Projects() {
                 {/* Modal Header */}
                 <div className="h-48 relative rounded-t-xl overflow-hidden">
                   <div className="absolute inset-0" style={{ backgroundColor: selectedProject.color + '20' }} />
+                  {selectedProject.image && (
+                    <img
+                      src={selectedProject.image}
+                      alt={selectedProject.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent" />
                   <button
                     onClick={() => setSelectedProject(null)}
                     className="absolute top-4 right-4 p-2 rounded-lg bg-dark-900/50 text-white 
-                             hover:bg-dark-900 transition-colors"
+                             hover:bg-dark-900 transition-colors z-10"
                   >
                     <X size={20} />
                   </button>
-                  <div className="absolute bottom-6 left-6">
+                  <div className="absolute bottom-6 left-6 z-10">
                     <span className="text-xs font-medium px-3 py-1 rounded-md mb-2 inline-block"
                           style={{ backgroundColor: selectedProject.color + '30', color: selectedProject.color }}>
                       {selectedProject.type}
@@ -190,9 +211,9 @@ export default function Projects() {
                     </ul>
                   </div>
 
-                  {selectedProject.link && selectedProject.link !== '#' && (
+                  {(selectedProject.liveUrl || (selectedProject.link && selectedProject.link !== '#')) && (
                     <a
-                      href={selectedProject.link}
+                      href={selectedProject.liveUrl || selectedProject.link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 

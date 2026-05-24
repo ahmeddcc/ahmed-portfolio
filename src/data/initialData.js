@@ -42,7 +42,7 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       color: "#6366f1",
       image: "/assets/projects/puzzle-key.jpg",
       link: "#",
-      liveUrl: ""              // ← جديد: رابط المشروع الحي
+      liveUrl: ""
     },
     {
       id: 2,
@@ -64,7 +64,7 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       color: "#f59e0b",
       image: "/assets/projects/tick-sys.jpg",
       link: "#",
-      liveUrl: ""              // ← جديد
+      liveUrl: ""
     },
     {
       id: 3,
@@ -83,7 +83,7 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       color: "#10b981",
       image: "/assets/projects/moussa.jpg",
       link: "#",
-      liveUrl: ""              // ← جديد
+      liveUrl: ""
     },
     {
       id: 4,
@@ -102,7 +102,7 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       color: "#3b82f6",
       image: "/assets/projects/almuwafi.jpg",
       link: "#",
-      liveUrl: "https://almuwafi.com"   // ← مثال: أضف الرابط الحقيقي
+      liveUrl: "https://almuwafi.com"
     },
     {
       id: 5,
@@ -121,7 +121,7 @@ Over the past two years I pushed into something new. Using AI tools, I built a l
       color: "#ec4899",
       image: "/assets/projects/books.jpg",
       link: "#",
-      liveUrl: "https://amazon.com/..."   // ← مثال: رابط Amazon KDP
+      liveUrl: "https://www.amazon.com/author/ahmedhamed"
     }
   ],
 
